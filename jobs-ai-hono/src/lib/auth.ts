@@ -75,16 +75,16 @@ export function createAuth(env: CloudflareBindings) {
                 enabled: false, // 禁用 cookie cache，避免超出大小限制
             },
         },
-        trustedOrigins: [env.CORS_ORIGIN,  env.CORS_ORIGIN_ADMIN],
+        trustedOrigins: [env.CORS_ORIGIN, env.CORS_ORIGIN_ADMIN].filter(Boolean),
         advanced: {
             cookiePrefix: "better-auth",
-            useSecureCookies: false, // 开发环境禁用，生产环境应设为 true
+            useSecureCookies: true, // 生产环境使用 HTTPS，必须为 true
             crossSubDomainCookies: {
                 enabled: false,
             },
             defaultCookieAttributes: {
-                sameSite: "lax", // 开发环境使用 lax，生产环境可以改为 strict
-                secure: false,
+                sameSite: "none", // 跨域请求需要 none
+                secure: true, // 生产环境使用 HTTPS
                 path: "/",
             },
         },

@@ -1,5 +1,6 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { adminCors } from "../../lib/cors";
+import { adminAuthMiddleware } from "../../lib/auth-middleware";
 import { getDb } from "../../db";
 import { contactMessage } from "../../db/schema/contact-schema";
 import { errorResponseSchema } from "../../schema/common-schema";
@@ -9,6 +10,8 @@ import { desc } from "drizzle-orm";
 const dashboardRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 dashboardRoute.use("/*", adminCors);
+// Admin 认证中间件
+dashboardRoute.use("/*", adminAuthMiddleware);
 
 // 获取 Dashboard 统计数据
 const getDashboardStatsRoute = createRoute({

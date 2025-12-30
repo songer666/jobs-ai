@@ -88,7 +88,28 @@ authRoute.all("/*", async (c) => {
   }
   
   const auth = createAuth(c.env);
-  return auth.handler(c.req.raw);
+  const response = await auth.handler(c.req.raw);
+  
+  // 获取请求的 origin
+  const origin = c.req.header("origin");
+  const allowedOrigins = [c.env.CORS_ORIGIN, c.env.CORS_ORIGIN_ADMIN];
+  
+  // 如果 origin 在允许列表中，添加 CORS 头
+  if (origin && allowedOrigins.includes(origin)) {
+    const newHeaders = new Headers(response.headers);
+    newHeaders.set("Access-Control-Allow-Origin", origin);
+    newHeaders.set("Access-Control-Allow-Credentials", "true");
+    newHeaders.set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, OPTIONS");
+    newHeaders.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    
+    return new Response(response.body, {
+      status: response.status,
+      statusText: response.statusText,
+      headers: newHeaders,
+    });
+  }
+  
+  return response;
 });
 
 export default authRoute;

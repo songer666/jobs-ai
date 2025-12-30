@@ -1,5 +1,6 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { adminCors } from "../../lib/cors";
+import { adminAuthMiddleware } from "../../lib/auth-middleware";
 import { createUserService } from "../../service/user-service";
 import { getDb } from "../../db";
 import {
@@ -20,6 +21,8 @@ const userRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 // CORS 中间件
 userRoute.use("/*", adminCors);
+// Admin 认证中间件
+userRoute.use("/*", adminAuthMiddleware);
 
 // 修改用户邮箱验证状态
 const verifyEmailRoute = createRoute({

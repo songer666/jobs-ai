@@ -1,5 +1,6 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { adminCors } from "../../lib/cors";
+import { adminAuthMiddleware } from "../../lib/auth-middleware";
 import { getDb } from "../../db";
 import { ResumeAnalysisService } from "../../service/resume-service";
 import { errorResponseSchema } from "../../schema/common-schema";
@@ -15,6 +16,8 @@ import {
 const resumeAnalysisRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 resumeAnalysisRoute.use("/*", adminCors);
+// Admin 认证中间件
+resumeAnalysisRoute.use("/*", adminAuthMiddleware);
 
 // 获取简历分析列表
 const getAnalysesRoute = createRoute({

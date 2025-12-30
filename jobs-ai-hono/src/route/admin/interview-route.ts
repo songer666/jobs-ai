@@ -1,5 +1,6 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { adminCors } from "../../lib/cors";
+import { adminAuthMiddleware } from "../../lib/auth-middleware";
 import { getDb } from "../../db";
 import { InterviewService } from "../../service/interview-service";
 import { successResponseSchema, errorResponseSchema } from "../../schema/common-schema";
@@ -7,6 +8,8 @@ import { successResponseSchema, errorResponseSchema } from "../../schema/common-
 const interviewRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 interviewRoute.use("/*", adminCors);
+// Admin 认证中间件
+interviewRoute.use("/*", adminAuthMiddleware);
 
 const getInterviewsRoute = createRoute({
     method: "get",

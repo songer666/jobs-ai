@@ -2,6 +2,7 @@ import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
 import { getDb } from "../../db";
 import { ContactService } from "../../service/contact-service";
 import { adminCors } from "../../lib/cors";
+import { adminAuthMiddleware } from "../../lib/auth-middleware";
 import {
     updateContactStatusSchema,
     contactMessageResponseSchema,
@@ -13,6 +14,8 @@ const contactRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 // CORS 中间件 - Admin 前端
 contactRoute.use("/*", adminCors);
+// Admin 认证中间件
+contactRoute.use("/*", adminAuthMiddleware);
 
 // 获取所有消息
 const getAllContactsRoute = createRoute({

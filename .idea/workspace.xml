@@ -1,7 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
   <component name="ChangeListManager">
-    <list default="true" id="c6f11f3f-ac0b-43fb-a5b8-3e15e3f75aca" name="Changes" comment="" />
+    <list default="true" id="c6f11f3f-ac0b-43fb-a5b8-3e15e3f75aca" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/lib/auth-middleware.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/lib/auth-middleware.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/lib/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/lib/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/lib/cors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/lib/cors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/contact-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/contact-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/dashboard-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/dashboard-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/interview-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/interview-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/question-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/question-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/resume-analysis-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/resume-analysis-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/resume-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/resume-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/user-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/admin/user-route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/jobs-ai-hono/src/route/auth-route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/jobs-ai-hono/src/route/auth-route.ts" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -23,15 +39,36 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "main",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "pnpm",
-    "ts.external.directory.path": "D:\\WebStorm 2025.2.2\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "npm.deploy.executor": "Run",
+    "ts.external.directory.path": "E:\\jobs-songer\\jobs-admin-vite\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RunManager">
+    <configuration name="deploy" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/jobs-ai-hono/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="deploy" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.deploy" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -46,7 +83,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1767109409501</updated>
-      <workItem from="1767109412091" duration="49000" />
+      <workItem from="1767109412091" duration="2364000" />
     </task>
     <servers />
   </component>

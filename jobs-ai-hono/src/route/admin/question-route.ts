@@ -1,5 +1,6 @@
 import { OpenAPIHono, createRoute } from "@hono/zod-openapi";
 import { adminCors } from "../../lib/cors";
+import { adminAuthMiddleware } from "../../lib/auth-middleware";
 import { getDb } from "../../db";
 import { QuestionService } from "../../service/question-service";
 import { errorResponseSchema } from "../../schema/common-schema";
@@ -15,6 +16,8 @@ import {
 const questionRoute = new OpenAPIHono<{ Bindings: CloudflareBindings }>();
 
 questionRoute.use("/*", adminCors);
+// Admin 认证中间件
+questionRoute.use("/*", adminAuthMiddleware);
 
 // 获取题目列表
 const getQuestionsRoute = createRoute({
