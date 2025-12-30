@@ -1,7 +1,7 @@
 /** API 基础配置 */
 export const API_CONFIG = {
   /** 后端服务基础地址 */
-  BASE_URL: 'https://jobs-ai-hono.ysyswenjoy.workers.dev/',
+  BASE_URL: 'https://jobs-ai-hono.ysyswenjoy.workers.dev',
   
   /** API 路径前缀 */
   API_PREFIX: '/api',
