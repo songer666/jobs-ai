@@ -1,0 +1,69 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1766411448105,
+      "tag": "0000_calm_klaw",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1766415583614,
+      "tag": "0001_talented_maria_hill",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1766578099473,
+      "tag": "0002_fuzzy_vargas",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "6",
+      "when": 1766584081855,
+      "tag": "0003_wealthy_rawhide_kid",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "6",
+      "when": 1766584776934,
+      "tag": "0004_magical_sunset_bain",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "6",
+      "when": 1766743719818,
+      "tag": "0005_fresh_captain_america",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1766752954418,
+      "tag": "0006_parched_prima",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1766832715168,
+      "tag": "0007_minor_mathemanic",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "6",
+      "when": 1766918127168,
+      "tag": "0008_fantastic_slipstream",
+      "breakpoints": true
+    }
+  ]
+}

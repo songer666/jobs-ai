@@ -1,0 +1,62 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "jobs-ai-hono",
+	"main": "src/index.ts",
+	"compatibility_date": "2025-12-21",
+	"compatibility_flags": [
+		"nodejs_compat"
+	],
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "exam",
+			"database_id": "988b1c03-ad70-46e8-b948-aa479d9d2db5"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "jobs-ai",
+			"bucket_name": "jobs-ai"
+		}
+	],
+	"vars": {
+		"REDIS_REST_URL": "",
+		"REDIS_REST_TOKEN": "",
+		"BETTER_AUTH_SECRET": "",
+		"BETTER_AUTH_URL": "http://localhost:3000",
+		"RESEND_API_KEY": "",
+		"GITHUB_CLIENT_ID": "",
+		"GITHUB_CLIENT_SECRET": "",
+		"CORS_ORIGIN": "",
+		"CORS_ORIGIN_ADMIN": "",
+		"QSTASH_URL": "",
+		"QSTASH_TOKEN": "",
+		"QSTASH_CURRENT_SIGNING_KEY": "",
+		"QSTASH_NEXT_SIGNING_KEY": "",
+		"DEEPSEEK_API_KEY": "",
+		"GEMINI_API_KEY": "",
+		"API_BASE_URL": ""
+	}
+	// "vars": {
+	//   "MY_VAR": "my-variable"
+	// },
+	// "kv_namespaces": [
+	//   {
+	//     "binding": "MY_KV_NAMESPACE",
+	//     "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+	//   }
+	// "d1_databases": [
+	//   {
+	//     "binding": "MY_DB",
+	//     "database_name": "my-database",
+	//     "database_id": ""
+	//   }
+	// ],
+	// "ai": {
+	//   "binding": "AI"
+	// },
+	// "observability": {
+	//   "enabled": true,
+	//   "head_sampling_rate": 1
+	// }
+}
