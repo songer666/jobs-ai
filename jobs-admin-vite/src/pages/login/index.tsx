@@ -8,10 +8,11 @@ import {
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import { message, theme } from 'antd';
+import { theme } from 'antd';
 import { useState } from 'react';
 import { signIn, signOut, authClient } from '../../lib/auth-client';
 import { useSessionCache } from '../../lib/session-provider';
+import { useMessage } from '../../hooks/useMessage';
 import Logo from '../../components/Logo';
 import styles from './index.module.css';
 
@@ -23,6 +24,7 @@ interface LoginFormValues {
 
 const LoginPage = () => {
   const { token } = theme.useToken();
+  const { message } = useMessage();
   const [loading, setLoading] = useState(false);
   const { clearAndRefetch } = useSessionCache();
 
@@ -70,8 +72,8 @@ const LoginPage = () => {
       <div className={styles.container} style={{ backgroundColor: token.colorBgContainer }}>
         <LoginForm<LoginFormValues>
           logo={<Logo size={48} />}
-          title="Exam AI"
-          subTitle="AI学习、试卷生成管理平台"
+          title="Jobs AI"
+          subTitle="AI 求职助手管理平台 - 模拟面试、简历优化、智能刷题"
           onFinish={handleSubmit}
           submitter={{
             searchConfig: {

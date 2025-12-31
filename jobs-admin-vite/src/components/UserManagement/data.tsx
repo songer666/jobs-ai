@@ -65,57 +65,85 @@ export const createColumns = (
   {
     title: '操作',
     width: 320,
-    render: (_, record) => (
-      <Space size={0} wrap>
-        <Button
-          type="link"
-          size="small"
-          icon={<KeyOutlined />}
-          onClick={() => onPasswordClick(record)}
-        >
-          密码
-        </Button>
-        <Button
-          type="link"
-          size="small"
-          icon={<HistoryOutlined />}
-          onClick={() => onSessionsClick(record)}
-        >
-          会话
-        </Button>
-        <Button
-          type="link"
-          size="small"
-          icon={<SafetyOutlined />}
-          onClick={() => onToggleEmailVerified(record.id, record.emailVerified)}
-        >
-          {record.emailVerified ? '取消验证' : '验证'}
-        </Button>
-        <Popconfirm
-          title={userRole === 'admin' ? '确定降级为普通用户吗？' : '确定升级为管理员吗？'}
-          onConfirm={() => onToggleRole(record.id)}
-        >
-          <Button type="link" size="small" icon={userRole === 'admin' ? <UserSwitchOutlined /> : <CrownOutlined />}>
-            {userRole === 'admin' ? '降级' : '升级'}
+    render: (_, record) => {
+      // 保护 admin 用户不被删除和重置密码
+      const isProtectedAdmin = record.username === 'admin';
+      
+      return (
+        <Space size={0} wrap>
+          <Button
+            type="link"
+            size="small"
+            icon={<KeyOutlined />}
+            onClick={() => onPasswordClick(record)}
+            disabled={isProtectedAdmin}
+            title={isProtectedAdmin ? '系统管理员账户不可重置密码' : undefined}
+          >
+            密码
           </Button>
-        </Popconfirm>
-        {record.banned ? (
-          <Button type="link" size="small" icon={<CheckCircleOutlined />} onClick={() => onUnbanUser(record.id)}>
-            解封
+          <Button
+            type="link"
+            size="small"
+            icon={<HistoryOutlined />}
+            onClick={() => onSessionsClick(record)}
+          >
+            会话
           </Button>
-        ) : (
-          <Popconfirm title="确定封禁该用户吗？" onConfirm={() => onBanUser(record.id)}>
-            <Button type="link" size="small" icon={<StopOutlined />}>
-              封禁
+          <Button
+            type="link"
+            size="small"
+            icon={<SafetyOutlined />}
+            disabled={isProtectedAdmin}
+            onClick={() => onToggleEmailVerified(record.id, record.emailVerified)}
+          >
+            {record.emailVerified ? '取消验证' : '验证'}
+          </Button>
+          <Popconfirm
+            title={userRole === 'admin' ? '确定降级为普通用户吗？' : '确定升级为管理员吗？'}
+            onConfirm={() => onToggleRole(record.id)}
+            disabled={isProtectedAdmin}
+          >
+            <Button 
+              type="link" 
+              size="small" 
+              icon={userRole === 'admin' ? <UserSwitchOutlined /> : <CrownOutlined />}
+              disabled={isProtectedAdmin}
+              title={isProtectedAdmin ? '系统管理员账户不可降级' : undefined}
+            >
+              {userRole === 'admin' ? '降级' : '升级'}
             </Button>
           </Popconfirm>
-        )}
-        <Popconfirm title="确定删除该用户吗？" onConfirm={() => onRemoveUser(record.id)}>
-          <Button type="link" danger size="small" icon={<DeleteOutlined />}>
-            删除
-          </Button>
-        </Popconfirm>
-      </Space>
-    ),
+          {record.banned ? (
+            <Button type="link" size="small" icon={<CheckCircleOutlined />} onClick={() => onUnbanUser(record.id)}>
+              解封
+            </Button>
+          ) : (
+            <Popconfirm title="确定封禁该用户吗？" onConfirm={() => onBanUser(record.id)} disabled={isProtectedAdmin}>
+              <Button 
+                type="link" 
+                size="small" 
+                icon={<StopOutlined />}
+                disabled={isProtectedAdmin}
+                title={isProtectedAdmin ? '系统管理员账户不可封禁' : undefined}
+              >
+                封禁
+              </Button>
+            </Popconfirm>
+          )}
+          <Popconfirm title="确定删除该用户吗？" onConfirm={() => onRemoveUser(record.id)} disabled={isProtectedAdmin}>
+            <Button 
+              type="link" 
+              danger 
+              size="small" 
+              icon={<DeleteOutlined />}
+              disabled={isProtectedAdmin}
+              title={isProtectedAdmin ? '系统管理员账户不可删除' : undefined}
+            >
+              删除
+            </Button>
+          </Popconfirm>
+        </Space>
+      );
+    },
   },
 ];

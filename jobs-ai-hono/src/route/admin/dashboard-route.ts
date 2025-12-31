@@ -44,14 +44,13 @@ dashboardRoute.openapi(getDashboardStatsRoute, async (c) => {
 
     try {
         // 并行获取所有统计数据
-        const [allUsers, allInterviews, allResumes, allQuestions, allResumeAnalyses, allContacts] = await Promise.all([
+        const [allUsers, allInterviews, allResumes, allQuestions, allContacts] = await Promise.all([
             db.query.user.findMany({
                 orderBy: (user: any, { desc: descFn }: any) => [descFn(user.createdAt)],
             }),
             db.query.interview.findMany(),
             db.query.resume.findMany(),
             db.query.question.findMany(),
-            db.query.resumeAnalysis.findMany(),
             db.select().from(contactMessage).orderBy(desc(contactMessage.createdAt)),
         ]);
 
@@ -61,7 +60,6 @@ dashboardRoute.openapi(getDashboardStatsRoute, async (c) => {
             totalInterviews: allInterviews.length,
             totalResumes: allResumes.length,
             totalQuestions: allQuestions.length,
-            totalResumeAnalyses: allResumeAnalyses.length,
             totalContacts: allContacts.length,
         };
 

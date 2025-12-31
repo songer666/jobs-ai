@@ -1,8 +1,11 @@
 import { Hono } from "hono";
 import { getDb } from "../../db";
 import { InterviewService } from "../../service/interview-service";
-import { generateInterviewFeedback } from "../../lib/ai";
-import type { EvaluateInterviewPayload, AutoEndInterviewPayload } from "../../lib/queue";
+import { ResumeService } from "../../service/resume-service";
+import { generateInterviewFeedback, createAIModels } from "../../lib/ai";
+import { streamText } from "ai";
+import { getResumeGenerationPrompt } from "../../lib/prompt/resume-prompt";
+import type { EvaluateInterviewPayload, AutoEndInterviewPayload, GenerateResumePayload } from "../../lib/queue";
 import { publishEvaluateInterview } from "../../lib/queue";
 
 export const qstashRoute = new Hono<{ Bindings: CloudflareBindings }>();
@@ -39,9 +42,20 @@ qstashRoute.post("/evaluate-interview", async (c) => {
             model
         );
 
-        // 从反馈中提取分数
-        const scoreMatch = feedback.match(/(\d+)\/10/);
-        const score = scoreMatch ? parseInt(scoreMatch[1]) * 10 : null;
+        // 从反馈中提取分数（优先匹配100分制，兼容10分制）
+        // 先尝试匹配 XX/100 格式
+        let scoreMatch = feedback.match(/(\d+)\s*[\/／]\s*100/);
+        let score: number | null = null;
+        
+        if (scoreMatch) {
+            score = parseInt(scoreMatch[1]);
+        } else {
+            // 兼容旧的 X/10 格式，转换为100分制
+            scoreMatch = feedback.match(/(\d+)\s*[\/／]\s*10(?!\d)/);
+            if (scoreMatch) {
+                score = parseInt(scoreMatch[1]) * 10;
+            }
+        }
 
         // 更新面试记录为已完成
         await service.update(interviewId, {
@@ -111,7 +125,7 @@ qstashRoute.post("/auto-end-interview", async (c) => {
 
         const db = getDb(c.env);
         const service = new InterviewService(db);
-        const { ChatMessageService } = await import("../../service/user/chat-message-service");
+        const { ChatMessageService } = await import("../../service/chat-message-service");
         const chatService = new ChatMessageService(db);
 
         // 获取面试信息
@@ -155,7 +169,7 @@ qstashRoute.post("/auto-end-interview", async (c) => {
         const userName = "候选人"; // TODO: 可以从 user 表获取真实姓名
 
         // 发送评分任务到 QStash
-        const baseUrl = c.env.API_BASE_URL || 'http://localhost:8787';
+        const baseUrl = c.env.API_BASE_URL;
         const callbackUrl = `${baseUrl}/api/webhook/qstash/evaluate-interview`;
 
         await publishEvaluateInterview(
@@ -172,7 +186,8 @@ qstashRoute.post("/auto-end-interview", async (c) => {
                 userName,
                 language: interview.language || 'zh',
                 model: (interview.model as 'gemini' | 'deepseek') || 'gemini',
-            }
+            },
+            c.env.QSTASH_URL
         );
 
         console.log("Auto-end interview completed:", interviewId);
@@ -186,3 +201,58 @@ qstashRoute.post("/auto-end-interview", async (c) => {
         }, 500);
     }
 });
+
+/**
+ * QStash 回调端点 - 处理简历生成
+ */
+qstashRoute.post("/generate-resume", async (c) => {
+    const signature = c.req.header("Upstash-Signature");
+    if (!signature && c.env.QSTASH_CURRENT_SIGNING_KEY) {
+        console.warn("Missing QStash signature");
+    }
+
+    try {
+        const payload = await c.req.json<GenerateResumePayload>();
+        const { resumeId, collectedInfo, stylePrompt, jobDescription, model } = payload;
+
+        console.log("Processing resume generation:", resumeId);
+
+        const db = getDb(c.env);
+        const resumeService = new ResumeService(db);
+
+        // 生成简历内容
+        const models = createAIModels(c.env);
+        const aiModel = model === 'deepseek' ? models.deepseek : models.gemini;
+        const prompt = getResumeGenerationPrompt(collectedInfo, stylePrompt, jobDescription);
+
+        let generatedContent = '';
+        const result = streamText({
+            model: aiModel,
+            prompt,
+            temperature: 0.7,
+        });
+
+        // 收集流式输出
+        for await (const chunk of result.textStream) {
+            generatedContent += chunk;
+        }
+
+        // 更新简历记录
+        await resumeService.update(resumeId, {
+            content: generatedContent,
+            status: 'generated',
+        });
+
+        console.log("Resume generation completed:", resumeId);
+
+        return c.json({ success: true, resumeId });
+    } catch (error) {
+        console.error("Resume generation failed:", error);
+        
+        return c.json({ 
+            success: false, 
+            error: error instanceof Error ? error.message : String(error) 
+        }, 500);
+    }
+});
+

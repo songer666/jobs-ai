@@ -3,7 +3,7 @@ import type { ActionType } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { admin } from '../../lib/auth-client';
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import styles from './index.module.css';
 import CreateUserModal from './CreateUserModal';
 import ResetPasswordModal from './ResetPasswordModal';
@@ -163,21 +163,24 @@ const UserManagement = ({ title, subTitle, userRole }: UserManagementProps) => {
     }
   };
 
-  const columns = createColumns(
-    userRole,
-    (user) => {
-      setSelectedUser(user);
-      setPasswordModalOpen(true);
-    },
-    (user) => {
-      setSelectedUser(user);
-      setSessionsModalOpen(true);
-    },
-    handleToggleEmailVerified,
-    handleToggleRole,
-    handleBanUser,
-    handleUnbanUser,
-    handleRemoveUser
+  const columns = useMemo(
+    () => createColumns(
+      userRole,
+      (user) => {
+        setSelectedUser(user);
+        setPasswordModalOpen(true);
+      },
+      (user) => {
+        setSelectedUser(user);
+        setSessionsModalOpen(true);
+      },
+      handleToggleEmailVerified,
+      handleToggleRole,
+      handleBanUser,
+      handleUnbanUser,
+      handleRemoveUser
+    ),
+    [userRole, handleToggleEmailVerified, handleToggleRole, handleBanUser, handleUnbanUser, handleRemoveUser]
   );
 
   return (

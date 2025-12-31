@@ -430,7 +430,7 @@ questionRoute.openapi(submitAnswerRoute, async (c) => {
     const stream = new ReadableStream({
         async start(controller) {
             try {
-                const result = streamText({
+                const result = await streamText({
                     model,
                     system: systemPrompt,
                     prompt: body.answer,

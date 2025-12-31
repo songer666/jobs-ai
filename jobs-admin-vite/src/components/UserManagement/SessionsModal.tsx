@@ -45,7 +45,7 @@ const SessionsModal = ({ open, userId, userName, onCancel }: SessionsModalProps)
     if (open && userId) {
       fetchSessions();
     }
-  }, [open, userId]);
+  }, [open, userId, fetchSessions]);
 
   const handleDeleteSession = async (sessionId: string) => {
     try {
@@ -56,7 +56,7 @@ const SessionsModal = ({ open, userId, userName, onCancel }: SessionsModalProps)
       } else {
         message.error('删除失败');
       }
-    } catch (err) {
+    } catch {
       message.error('删除失败');
     }
   };
@@ -70,7 +70,7 @@ const SessionsModal = ({ open, userId, userName, onCancel }: SessionsModalProps)
       } else {
         message.error('删除失败');
       }
-    } catch (err) {
+    } catch {
       message.error('删除失败');
     }
   };

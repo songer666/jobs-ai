@@ -7,7 +7,6 @@ import {
   CommentOutlined,
   FileTextOutlined,
   QuestionCircleOutlined,
-  FileSearchOutlined,
 } from '@ant-design/icons';
 
 const menuConfig = {
@@ -50,11 +49,6 @@ const menuConfig = {
         path: '/question/list',
         name: '题目管理',
         icon: <QuestionCircleOutlined />,
-      },
-      {
-        path: '/resume-analysis/list',
-        name: '简历分析',
-        icon: <FileSearchOutlined />,
       },
       {
         path: '/contact/list',

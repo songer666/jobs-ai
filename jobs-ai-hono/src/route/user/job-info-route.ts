@@ -120,6 +120,7 @@ jobInfoRoute.openapi(getJobInfoRoute, async (c) => {
     ...jobInfo,
     createdAt: jobInfo.createdAt.getTime(),
     updatedAt: jobInfo.updatedAt.getTime(),
+    isOwner: jobInfo.userId === user.id,
   } : undefined;
   return c.json({ success: true, jobInfo: formattedJobInfo }, 200);
 });

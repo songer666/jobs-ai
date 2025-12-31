@@ -3,7 +3,6 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { emailOTP, username, admin } from "better-auth/plugins";
 import { getDb } from "../db";
 import * as schema from "../db/schema";
-import { env } from "cloudflare:workers";
 import { createResend, sendOTPEmail } from "./resend";
 
 // 静态 auth 实例供 CLI 使用（仅用于类型推断和 schema 生成）

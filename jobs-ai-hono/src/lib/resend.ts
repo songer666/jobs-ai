@@ -12,8 +12,13 @@ export interface SendEmailOptions {
 }
 
 export async function sendEmail(resend: Resend, options: SendEmailOptions) {
-    const { to, subject, html, from = 'onboarding@resend.dev' } = options;
-    
+    const {
+        to,
+        subject,
+        html,
+        from = 'JobsAI <noreply@mail.jobsai.top>',
+    } = options;
+
     return resend.emails.send({
         from,
         to,
@@ -21,6 +26,7 @@ export async function sendEmail(resend: Resend, options: SendEmailOptions) {
         html,
     });
 }
+
 
 export interface SendOTPEmailOptions {
     to: string;

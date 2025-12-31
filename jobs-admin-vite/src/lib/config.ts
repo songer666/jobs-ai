@@ -1,7 +1,8 @@
 /** API 基础配置 */
 export const API_CONFIG = {
   /** 后端服务基础地址 */
-  BASE_URL: 'https://jobs-ai-hono.ysyswenjoy.workers.dev',
+  BASE_URL: 'https://api.jobsai.top',
+  // BASE_URL: 'http://localhost:8787',
   
   /** API 路径前缀 */
   API_PREFIX: '/api',
@@ -58,13 +59,6 @@ export const API_PATHS = {
     DETAIL: (id: string) => `/admin/question/${id}`,
     DELETE: (id: string) => `/admin/question/${id}`,
     STATS: '/admin/question/stats/overview',
-  },
-
-  ADMIN_RESUME_ANALYSIS: {
-    LIST: '/admin/resume-analysis',
-    DETAIL: (id: string) => `/admin/resume-analysis/${id}`,
-    DELETE: (id: string) => `/admin/resume-analysis/${id}`,
-    STATS: '/admin/resume-analysis/stats/overview',
   },
 };
 

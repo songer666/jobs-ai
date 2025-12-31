@@ -1,7 +1,5 @@
 import { OpenAPIHono, createRoute, z } from "@hono/zod-openapi";
-import { streamText } from "ai";
 import { createRedis } from "../../lib/redis";
-import { createAIModels } from "../../lib/ai";
 import { getDb } from "../../db";
 import { nextCors } from "../../lib/cors";
 import { authMiddleware } from "../../lib/auth-middleware";
@@ -9,7 +7,8 @@ import { ResumeService } from "../../service/resume-service";
 import { JobInfoService } from "../../service/job-info-service";
 import { createProfileService } from "../../service/profile-service";
 import { createResumeGeneratorService, createResumeR2Service, RESUME_CHAT_QUESTIONS } from "../../service/resume-generator-service";
-import { getResumeGenerationPrompt } from "../../lib/prompt/resume-prompt";
+import { publishGenerateResume } from "../../lib/queue";
+import type { GenerateResumePayload } from "../../lib/queue";
 import {
     resumeResponseSchema,
     resumeListResponseSchema,
@@ -323,16 +322,17 @@ resumeGeneratorRoute.openapi(sendChatRoute, async (c) => {
     }, 200);
 });
 
-// ==================== AI 生成简历（流式） ====================
+// ==================== AI 生成简历（异步任务） ====================
 const generateResumeRoute = createRoute({
     method: "post",
     path: "/generate",
     tags: ["Resume Generator"],
-    summary: "AI 生成简历",
+    summary: "AI 生成简历（异步）",
     request: { body: { content: { "application/json": { schema: generateResumeRequestSchema } } } },
     responses: {
-        200: { content: { "text/event-stream": { schema: z.any() } }, description: "流式返回简历" },
+        200: { content: { "application/json": { schema: z.object({ success: z.boolean(), resumeId: z.string(), message: z.string() }) } }, description: "任务已创建" },
         401: { content: { "application/json": { schema: errorResponseSchema } }, description: "未登录" },
+        404: { content: { "application/json": { schema: errorResponseSchema } }, description: "对话不存在" },
         429: { content: { "application/json": { schema: errorResponseSchema } }, description: "今日次数已用完" },
     },
 });
@@ -350,10 +350,10 @@ resumeGeneratorRoute.openapi(generateResumeRoute, async (c) => {
     // 检查限流
     const rateLimit = await checkGenerateRateLimit(redis, user.id, user.role as string);
     if (!rateLimit.allowed) {
-        return c.json({ success: false, message: rateLimit.message }, 429);
+        return c.json({ success: false, message: rateLimit.message || '超出限制' }, 429);
     }
 
-    // 判断是否使用个人信息直接生成（profile 模式、重新生成模式、或 useProfile 为 true）
+    // 判断是否使用个人信息直接生成
     const isProfileMode = body.conversationId.startsWith('profile-') && body.useProfile;
     const isRegenerateMode = body.conversationId.startsWith('regenerate-') && body.useProfile;
     const shouldUseProfile = isProfileMode || isRegenerateMode || (body.resumeId && body.useProfile);
@@ -361,51 +361,47 @@ resumeGeneratorRoute.openapi(generateResumeRoute, async (c) => {
     let collectedInfo: Record<string, any> = {};
     
     if (shouldUseProfile) {
-        // 使用个人信息直接生成（新建或重新生成）
         const profile = await profileService.getProfileByUserId(user.id);
         if (!profile) {
-            return c.json({ success: false, message: "未找到个人信息，请先在设置中填写" }, 404);
+            // 匿名模式：使用空信息
+            collectedInfo = {
+                name: '匿名用户',
+                phone: '',
+                location: '',
+                education: '',
+                workYears: '',
+                skills: '',
+                summary: '',
+            };
+        } else {
+            collectedInfo = {
+                name: profile.realName || '匿名用户',
+                phone: profile.phone || '',
+                location: profile.location || '',
+                education: profile.education || '',
+                workYears: profile.workYears || '',
+                skills: profile.skills || '',
+                summary: profile.summary || profile.selfEvaluation || '',
+                jobTarget: profile.jobTarget || '',
+                expectedSalary: profile.expectedSalary || '',
+                workExperience: profile.workExperience || '',
+                projects: profile.projects || '',
+                certificates: profile.certificates || '',
+                languages: profile.languages || '',
+                github: profile.github || '',
+                linkedin: profile.linkedin || '',
+                portfolio: profile.portfolio || '',
+            };
         }
-        collectedInfo = {
-            name: profile.realName || '',
-            phone: profile.phone || '',
-            location: profile.location || '',
-            education: profile.education || '',
-            workYears: profile.workYears || '',
-            skills: profile.skills || '',
-            summary: profile.summary || profile.selfEvaluation || '',
-            jobTarget: profile.jobTarget || '',
-            expectedSalary: profile.expectedSalary || '',
-            workExperience: profile.workExperience || '',
-            projects: profile.projects || '',
-            certificates: profile.certificates || '',
-            languages: profile.languages || '',
-            github: profile.github || '',
-            linkedin: profile.linkedin || '',
-            portfolio: profile.portfolio || '',
-        };
     } else {
-        // 使用对话收集的信息
         const conversation = await getChatConversation(redis, body.conversationId);
         if (!conversation || conversation.userId !== user.id) {
             return c.json({ success: false, message: "对话不存在或已过期" }, 404);
         }
         collectedInfo = { ...conversation.collectedInfo };
-        
-        if (body.useProfile) {
-            const profile = await profileService.getProfileByUserId(user.id);
-            if (profile) {
-                if (profile.realName && !collectedInfo.name) collectedInfo.name = profile.realName;
-                if (profile.phone && !collectedInfo.phone) collectedInfo.phone = profile.phone;
-                if (profile.education && !collectedInfo.education) collectedInfo.education = profile.education;
-                if (profile.skills && !collectedInfo.skills) collectedInfo.skills = profile.skills;
-                if (profile.workYears && !collectedInfo.workYears) collectedInfo.workYears = profile.workYears;
-                if (profile.summary && !collectedInfo.summary) collectedInfo.summary = profile.summary;
-            }
-        }
     }
 
-    // 获取职位信息（可选）
+    // 获取职位信息
     let jobDescription: string | undefined;
     if (body.jobInfoId) {
         const jobInfo = await jobInfoService.findById(body.jobInfoId);
@@ -414,111 +410,54 @@ resumeGeneratorRoute.openapi(generateResumeRoute, async (c) => {
         }
     }
 
-    // 使用样式 prompt
     const stylePrompt = body.stylePrompt || DEFAULT_STYLE_PROMPT;
 
-    // 如果是首次生成（没有 resumeId），先创建简历记录并返回 resumeId
-    // 前端收到后跳转到详情页，然后再次调用此接口进行流式生成
-    if (!body.resumeId && shouldUseProfile) {
+    // 创建或获取简历记录
+    let resumeId = body.resumeId;
+    if (!resumeId) {
         const newResume = await resumeService.create({
             userId: user.id,
             name: `AI生成简历-${new Date().toLocaleDateString()}`,
             jobInfoId: body.jobInfoId,
             stylePrompt: stylePrompt,
         });
-        
-        return c.json({
-            success: true,
-            resumeId: newResume.id,
-            message: '简历记录已创建，请开始生成',
-        }, 200);
+        resumeId = newResume.id;
     }
 
-    // 流式生成
-    const systemPrompt = getResumeGenerationPrompt(
+    // 发送生成任务到 QStash
+    const baseUrl = c.env.API_BASE_URL;
+    const callbackUrl = `${baseUrl}/api/webhook/qstash/generate-resume`;
+
+    const qstashPayload: GenerateResumePayload = {
+        resumeId,
+        userId: user.id,
         collectedInfo,
         stylePrompt,
-        jobDescription
+        jobDescription,
+        language: body.language || 'zh',
+        model: (body.model as 'gemini' | 'deepseek') || 'deepseek',
+    };
+
+    await publishGenerateResume(
+        c.env.QSTASH_TOKEN,
+        callbackUrl,
+        qstashPayload,
+        c.env.QSTASH_URL
     );
 
-    const models = createAIModels(c.env);
-    const modelName = body.model || 'deepseek';
-    const model = modelName === 'gemini' ? models.gemini : models.deepseek;
-    let fullText = '';
+    // 扣除次数
+    await incrementGenerateCount(redis, user.id);
+    
+    // 删除对话缓存
+    await deleteChatConversation(redis, body.conversationId);
 
-    c.header('Content-Type', 'text/event-stream');
-    c.header('Cache-Control', 'no-cache');
-    c.header('Connection', 'keep-alive');
-
-    const stream = new ReadableStream({
-        async start(controller) {
-            try {
-                const result = streamText({
-                    model,
-                    system: systemPrompt,
-                    prompt: body.language === 'en' 
-                        ? 'Please generate the resume content based on the above information, return in HTML format with inline CSS styles.'
-                        : '请根据以上信息生成简历内容，以 HTML 格式返回，包含内联 CSS 样式。',
-                    onFinish: async ({ text }) => {
-                        fullText = text;
-
-                        // 创建或更新简历记录
-                        let resumeId = body.resumeId;
-                        if (resumeId) {
-                            // 重新生成：更新现有简历
-                            await resumeService.update(resumeId, {
-                                content: fullText,
-                                stylePrompt: stylePrompt,
-                                status: 'generated',
-                            });
-                        } else {
-                            // 新建简历
-                            const newResume = await resumeService.create({
-                                userId: user.id,
-                                name: `AI生成简历-${new Date().toLocaleDateString()}`,
-                                jobInfoId: body.jobInfoId,
-                                content: fullText,
-                                stylePrompt: stylePrompt,
-                            });
-                            resumeId = newResume.id;
-                            await resumeService.update(resumeId, { status: 'generated' });
-                        }
-                        
-                        // 生成成功后扣除积分
-                        await incrementGenerateCount(redis, user.id);
-
-                        // 删除对话缓存
-                        await deleteChatConversation(redis, body.conversationId);
-
-                        controller.enqueue(
-                            new TextEncoder().encode(`data: ${JSON.stringify({ type: 'done', resumeId })}\n\n`)
-                        );
-                        controller.close();
-                    },
-                });
-
-                for await (const chunk of result.textStream) {
-                    controller.enqueue(
-                        new TextEncoder().encode(`data: ${JSON.stringify({ type: 'text', content: chunk })}\n\n`)
-                    );
-                }
-            } catch (error) {
-                controller.enqueue(
-                    new TextEncoder().encode(`data: ${JSON.stringify({ type: 'error', message: String(error) })}\n\n`)
-                );
-                controller.close();
-            }
-        },
-    });
-
-    return new Response(stream, {
-        headers: {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
-        },
-    });
+    return c.json({
+        success: true,
+        resumeId,
+        message: '简历生成任务已创建',
+    }, 200);
 });
+
 
 // ==================== 获取简历文件（代理 R2） ====================
 const getFileRoute = createRoute({

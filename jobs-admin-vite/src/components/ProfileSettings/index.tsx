@@ -32,7 +32,7 @@ const ProfileSettings = () => {
     if (session?.user?.id) {
       fetchProfile();
     }
-  }, [session?.user?.id]);
+  }, [session?.user?.id, fetchProfile]);
 
   if (loading) {
     return (

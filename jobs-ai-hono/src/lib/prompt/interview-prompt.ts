@@ -75,6 +75,10 @@ Output only the single question, nothing else.`;
     }
     
     // 第2-7题：技术问题
+    const endIntentResponse = language === 'zh'
+        ? `好的，我理解你想结束面试了。非常感谢你今天抽出时间来参加面试！你的回答给我留下了深刻的印象。我们会尽快完成评估，并与你联系。祝你一切顺利！`
+        : `I understand you'd like to wrap up. Thank you so much for taking the time to interview with us today! Your responses have been impressive. We'll complete our evaluation soon and get back to you. Best of luck!`;
+    
     return `You are a friendly and professional AI interviewer conducting a technical interview. You want to understand the candidate's skills while keeping the conversation natural and comfortable. Generate **ONE single, focused question** for the candidate.
 
 Job Information:
@@ -85,17 +89,18 @@ ${jobInfo.title ? `- Job Title: \`${jobInfo.title}\`` : ''}
 This is question ${questionNumber} of the interview (technical phase).
 
 **CRITICAL RULES:**
-1. Ask only ONE question at a time - never multiple questions or sub-questions
-2. Keep the question SHORT and CONVERSATIONAL (2-3 sentences maximum)
-3. Use a warm, encouraging tone - like a colleague asking about your experience
-4. Do NOT include bullet points or numbered lists in the question
-5. Do NOT ask compound questions (no "and also" or "additionally")
-6. Focus on ONE specific concept or skill per question
-7. Difficulty level: "${difficulty}"
-8. Use ${lang.outputLanguage} language
-9. **IMPORTANT: Do NOT repeat or ask similar questions to what has already been asked in the conversation history. Each question must cover a DIFFERENT topic.**
-10. Vary the topics: cover different aspects like system design, coding practices, debugging, teamwork, problem-solving, specific technologies mentioned in the job description
-11. Add natural transitions like "好的，明白了。那我想了解一下..." or "很好。接下来..." to make it feel like a real conversation
+1. **IMPORTANT: First check if the candidate's last message indicates they want to END the interview** (e.g., "我想结束了", "就到这里吧", "没有其他问题了", "I'd like to stop", "that's all", "let's wrap up"). If so, respond with a warm closing message like: "${endIntentResponse}" and do NOT ask another question.
+2. Ask only ONE question at a time - never multiple questions or sub-questions
+3. Keep the question SHORT and CONVERSATIONAL (2-3 sentences maximum)
+4. Use a warm, encouraging tone - like a colleague asking about your experience
+5. Do NOT include bullet points or numbered lists in the question
+6. Do NOT ask compound questions (no "and also" or "additionally")
+7. Focus on ONE specific concept or skill per question
+8. Difficulty level: "${difficulty}"
+9. Use ${lang.outputLanguage} language
+10. **IMPORTANT: Do NOT repeat or ask similar questions to what has already been asked in the conversation history. Each question must cover a DIFFERENT topic.**
+11. Vary the topics: cover different aspects like system design, coding practices, debugging, teamwork, problem-solving, specific technologies mentioned in the job description
+12. Add natural transitions like "好的，明白了。那我想了解一下..." or "很好。接下来..." to make it feel like a real conversation
 
 **Good examples:** 
 - "好的，明白了。那我想了解一下，你在项目中是如何使用 Redis 进行缓存优化的？"
@@ -103,7 +108,7 @@ This is question ${questionNumber} of the interview (technical phase).
 
 **Bad example:** "请描述你如何使用 Redis，包括缓存策略、过期机制、以及如何处理缓存击穿问题..."
 
-Output only the single question with natural transition, nothing else.`;
+Output only the single question with natural transition (or closing message if ending), nothing else.`;
 }
 
 export function getInterviewFeedbackSystemPrompt(
@@ -154,7 +159,10 @@ Additional Notes:
 - Reference specific moments from the transcript where useful.
 - Be clear, constructive, and actionable.
 - Refer to the interviewee as "${lang.referToCandidate}" in your feedback.
-- Include a number rating (out of 10) for each category and an overall rating at the start.`;
+- Include a number rating (out of 100) for each category and an overall rating at the start.
+- The overall rating should be a precise score like 75/100, 82/100, 68/100, etc. (not just multiples of 10).
+- Format the overall rating as: "总体评分：XX/100" (Chinese) or "Overall Score: XX/100" (English) at the very beginning of your response.
+- **IMPORTANT: Consider the number of questions answered.** A complete interview should have 8-10 questions answered. If the candidate answered fewer questions (e.g., only 2-3), this should significantly lower the overall score regardless of answer quality. Deduct approximately 10 points for each missing question below 8.`;
 }
 
 export function getQuestionFeedbackSystemPrompt(

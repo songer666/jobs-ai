@@ -9,8 +9,8 @@
 	"d1_databases": [
 		{
 			"binding": "DB",
-			"database_name": "exam",
-			"database_id": "988b1c03-ad70-46e8-b948-aa479d9d2db5"
+//			"database_name": "jobs",
+			"database_id": ""
 		}
 	],
 	"r2_buckets": [
@@ -20,22 +20,22 @@
 		}
 	],
 	"vars": {
-		"REDIS_REST_URL": "",
-		"REDIS_REST_TOKEN": "",
-		"BETTER_AUTH_SECRET": "",
-		"BETTER_AUTH_URL": "http://localhost:3000",
-		"RESEND_API_KEY": "",
-		"GITHUB_CLIENT_ID": "",
-		"GITHUB_CLIENT_SECRET": "",
-		"CORS_ORIGIN": "",
-		"CORS_ORIGIN_ADMIN": "",
-		"QSTASH_URL": "",
-		"QSTASH_TOKEN": "",
-		"QSTASH_CURRENT_SIGNING_KEY": "",
-		"QSTASH_NEXT_SIGNING_KEY": "",
-		"DEEPSEEK_API_KEY": "",
-		"GEMINI_API_KEY": "",
-		"API_BASE_URL": ""
+      "REDIS_REST_URL": "",
+      "REDIS_REST_TOKEN": "",
+      "BETTER_AUTH_SECRET": "",
+      "BETTER_AUTH_URL": "http://localhost:3000",
+      "RESEND_API_KEY": "",
+      "GITHUB_CLIENT_ID": "",
+      "GITHUB_CLIENT_SECRET": "",
+      "CORS_ORIGIN": "http://localhost:3000",
+	  "CORS_ORIGIN_ADMIN": "http://localhost:5173",
+	  "QSTASH_URL": "http://localhost:8080",
+	  "QSTASH_TOKEN": "eyJVc2VySUQiOiJkZWZhdWx0VXNlciIsIlBhc3N3b3JkIjoiZGVmYXVsdFBhc3N3b3JkIn0=",
+	  "QSTASH_CURRENT_SIGNING_KEY": "sig_7kYjw48mhY7kAjqNGcy6cr29RJ6r",
+	  "QSTASH_NEXT_SIGNING_KEY": "sig_5ZB6DVzB1wjE8S6rZ7eenA8Pdnhs",
+      "DEEPSEEK_API_KEY": "",
+      "GEMINI_API_KEY": "",
+      "API_BASE_URL": "http://localhost:8787",
 	}
 	// "vars": {
 	//   "MY_VAR": "my-variable"

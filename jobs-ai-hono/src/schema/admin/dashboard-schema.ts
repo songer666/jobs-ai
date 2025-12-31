@@ -8,7 +8,6 @@ export const dashboardStatsResponseSchema = z.object({
         totalInterviews: z.number(),
         totalResumes: z.number(),
         totalQuestions: z.number(),
-        totalResumeAnalyses: z.number(),
         totalContacts: z.number(),
     }),
     recentContacts: z.array(z.object({

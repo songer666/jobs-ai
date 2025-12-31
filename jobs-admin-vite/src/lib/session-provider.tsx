@@ -79,10 +79,12 @@ export const SessionProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useSessionCache = () => {
+function useSessionCache() {
   const context = useContext(SessionContext);
-  if (context === undefined) {
+  if (!context) {
     throw new Error('useSessionCache must be used within SessionProvider');
   }
   return context;
-};
+}
+
+export { useSessionCache };

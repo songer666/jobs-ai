@@ -1,3 +1,5 @@
 import InterviewManagement from '../../../components/InterviewManagement';
 
-export default () => <InterviewManagement />;
+const InterviewListPage = () => <InterviewManagement />;
+
+export default InterviewListPage;

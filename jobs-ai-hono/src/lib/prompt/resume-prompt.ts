@@ -157,54 +157,6 @@ ${stylePrompt}
 - **关键**：所有网址链接（GitHub、LinkedIn、个人网站等）必须以纯文本形式显示完整 URL，不要使用 <a> 标签，例如：https://github.com/username 而不是 <a href="...">GitHub</a>`;
 }
 
-export function getResumeAnalysisPrompt(
-    resumeContent: string,
-    jobDescription?: string
-): string {
-    const jobContext = jobDescription
-        ? `\n\n目标职位描述：\n${jobDescription}`
-        : '';
-
-    return `你是一个资深的HR和简历优化专家。请对以下简历进行全面分析和评估。
-
-简历内容：
-${resumeContent}
-${jobContext}
-
-请从以下维度进行分析：
-
-1. **整体评分** (1-100分)
-   - 给出一个综合评分
-
-2. **ATS友好度分析**
-   - 评估简历是否符合ATS（自动筛选系统）要求
-   - 检查格式、关键词使用等
-
-3. **职位匹配度** ${jobDescription ? '(基于目标职位)' : '(通用评估)'}
-   - 技能匹配程度
-   - 经验相关性
-   - 缺失的关键要求
-
-4. **内容质量**
-   - 描述是否具体、量化
-   - 成就是否突出
-   - 语言是否专业
-
-5. **格式与排版**
-   - 结构是否清晰
-   - 信息是否完整
-   - 长度是否合适
-
-6. **优化建议**
-   - 列出3-5条具体的改进建议
-   - 每条建议要具体可操作
-
-7. **亮点**
-   - 指出简历中的优势和亮点
-
-请以结构化的Markdown格式返回分析结果，使用清晰的标题和列表。`;
-}
-
 export function parseResumeFromChat(messages: Array<{role: string; content: string}>): Record<string, any> {
     const collectedInfo: Record<string, any> = {
         basicInfo: {},

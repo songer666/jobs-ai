@@ -1,3 +1,5 @@
 import ResumeManagement from '../../../components/ResumeManagement';
 
-export default () => <ResumeManagement />;
+const ResumeListPage = () => <ResumeManagement />;
+
+export default ResumeListPage;

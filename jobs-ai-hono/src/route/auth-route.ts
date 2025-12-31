@@ -32,22 +32,22 @@ authRoute.use("/*", async (c, next) => {
 });
 
 // 直接调用 better-auth API 发送 OTP（调试用）
-authRoute.post("/send-otp-api", async (c) => {
-  const { email, type } = await c.req.json();
-  console.log("[send-otp-api] email:", email, "type:", type);
-  try {
-    const auth = createAuth(c.env);
-    // 直接调用 better-auth 的 API
-    const result = await auth.api.sendVerificationOTP({
-      body: { email, type: type || "email-verification" },
-    });
-    console.log("[send-otp-api] result:", result);
-    return c.json({ success: true, result });
-  } catch (error) {
-    console.error("[send-otp-api] error:", error);
-    return c.json({ error: String(error) }, 500);
-  }
-});
+// authRoute.post("/send-otp-api", async (c) => {
+//   const { email, type } = await c.req.json();
+//   console.log("[send-otp-api] email:", email, "type:", type);
+//   try {
+//     const auth = createAuth(c.env);
+//     // 直接调用 better-auth 的 API
+//     const result = await auth.api.sendVerificationOTP({
+//       body: { email, type: type || "email-verification" },
+//     });
+//     console.log("[send-otp-api] result:", result);
+//     return c.json({ success: true, result });
+//   } catch (error) {
+//     console.error("[send-otp-api] error:", error);
+//     return c.json({ error: String(error) }, 500);
+//   }
+// });
 
 // 检查用户是否存在
 authRoute.post("/check-user", async (c) => {

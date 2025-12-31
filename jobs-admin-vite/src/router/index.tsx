@@ -12,7 +12,6 @@ const ContactListPage = lazy(() => import('../pages/contact/list'));
 const InterviewListPage = lazy(() => import('../pages/interview/list'));
 const ResumeListPage = lazy(() => import('../pages/resume/list'));
 const QuestionListPage = lazy(() => import('../pages/question/list'));
-const ResumeAnalysisListPage = lazy(() => import('../pages/resume-analysis/list'));
 
 const router = createHashRouter([
   {
@@ -62,10 +61,6 @@ const router = createHashRouter([
       {
         path: 'question/list',
         element: <LazyLoad><QuestionListPage /></LazyLoad>,
-      },
-      {
-        path: 'resume-analysis/list',
-        element: <LazyLoad><ResumeAnalysisListPage /></LazyLoad>,
       },
     ],
   },

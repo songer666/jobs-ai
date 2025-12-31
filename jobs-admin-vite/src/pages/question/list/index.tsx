@@ -1,3 +1,5 @@
 import QuestionManagement from '../../../components/QuestionManagement';
 
-export default () => <QuestionManagement />;
+const QuestionListPage = () => <QuestionManagement />;
+
+export default QuestionListPage;

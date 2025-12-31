@@ -4,7 +4,6 @@ import { z } from "zod";
 export const dashboardStatsSchema = z.object({
     interviewCount: z.number(),
     resumeCount: z.number(),
-    analysisCount: z.number(),
     questionCount: z.number(),
 });
 
@@ -17,13 +16,12 @@ export const dashboardUsageItemSchema = z.object({
 export const dashboardUsageSchema = z.object({
     interview: dashboardUsageItemSchema,
     generate: dashboardUsageItemSchema,
-    analyze: dashboardUsageItemSchema,
     question: dashboardUsageItemSchema,
 });
 
 // Dashboard 最近活动
 export const dashboardActivitySchema = z.object({
-    type: z.enum(['interview', 'resume', 'analysis', 'question']),
+    type: z.enum(['interview', 'resume', 'question']),
     id: z.string(),
     title: z.string(),
     date: z.number(),

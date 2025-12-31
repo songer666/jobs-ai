@@ -81,7 +81,7 @@ const InterviewManagement = ({ title = '面试管理', subTitle = '查看和管�
             let filteredData = res.interviews || [];
             if (params.userName) {
               const searchText = String(params.userName).toLowerCase();
-              filteredData = filteredData.filter(item => 
+              filteredData = filteredData.filter((item: InterviewItem) => 
                 item.user?.name?.toLowerCase().includes(searchText) ||
                 item.user?.email?.toLowerCase().includes(searchText)
               );

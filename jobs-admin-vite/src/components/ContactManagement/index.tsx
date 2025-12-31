@@ -2,7 +2,7 @@ import { PageContainer, ProTable } from '@ant-design/pro-components';
 import type { ActionType } from '@ant-design/pro-components';
 import { Space, Drawer, Descriptions } from 'antd';
 import { MailOutlined } from '@ant-design/icons';
-import { useRef, useState } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import { contactApi } from '../../api/contact';
 import { useMessage } from '../../hooks/useMessage';
 import type { ContactMessage, ContactStatus, ContactManagementProps } from './type';
@@ -63,15 +63,18 @@ const ContactManagement = ({
     }
   };
 
-  const handleViewDetail = async (record: ContactMessage) => {
+  const handleViewDetail = useCallback(async (record: ContactMessage) => {
     setSelectedMessage(record);
     setDrawerOpen(true);
     if (record.status === 'pending') {
       await handleUpdateStatus(record.id, 'replied');
     }
-  };
+  }, [handleUpdateStatus]);
 
-  const columns = createColumns(handleViewDetail, handleUpdateStatus, handleDelete);
+  const columns = useMemo(
+    () => createColumns(handleViewDetail, handleUpdateStatus, handleDelete),
+    [handleViewDetail, handleUpdateStatus, handleDelete]
+  );
 
   return (
     <PageContainer

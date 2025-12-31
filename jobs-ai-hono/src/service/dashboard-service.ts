@@ -1,18 +1,16 @@
 import type { DrizzleD1Database } from "drizzle-orm/d1";
 import { eq, desc, count } from "drizzle-orm";
-import { interview, resume, resumeAnalysis, question, jobInfo } from "../db/schema";
+import { interview, resume, question, jobInfo } from "../db/schema";
 import type { DashboardData, DashboardActivity } from "../type/dashboard-type";
 
 // Redis key 前缀
 const INTERVIEW_RATE_LIMIT_PREFIX = 'rate_limit:interview:';
 const RESUME_GENERATE_LIMIT_PREFIX = 'rate_limit:resume_generate:';
-const RESUME_ANALYZE_LIMIT_PREFIX = 'rate_limit:resume_analyze:';
 const QUESTION_RATE_LIMIT_PREFIX = 'rate_limit:question:';
 
 // 限制配置
 const FREE_USER_DAILY_INTERVIEW_LIMIT = 10;
 const FREE_USER_DAILY_GENERATE_LIMIT = 20;
-const FREE_USER_DAILY_ANALYZE_LIMIT = 20;
 const FREE_USER_DAILY_QUESTION_LIMIT = 20;
 
 function getTodayKey(): string {
@@ -31,21 +29,17 @@ export class DashboardService {
         const [
             interviewCount,
             resumeCount,
-            analysisCount,
             questionCount,
             interviews,
             resumes,
-            analyses,
             questions,
             interviewUsed,
             generateUsed,
-            analyzeUsed,
             questionUsed,
         ] = await Promise.all([
             // 获取总数统计
             this.db.select({ count: count() }).from(interview).where(eq(interview.userId, userId)).then(r => r[0]?.count || 0),
             this.db.select({ count: count() }).from(resume).where(eq(resume.userId, userId)).then(r => r[0]?.count || 0),
-            this.db.select({ count: count() }).from(resumeAnalysis).where(eq(resumeAnalysis.userId, userId)).then(r => r[0]?.count || 0),
             this.db.select({ count: count() }).from(question).where(eq(question.userId, userId)).then(r => r[0]?.count || 0),
             
             // 获取面试列表（关联 jobInfo 获取职位名称）
@@ -72,18 +66,6 @@ export class DashboardService {
             .orderBy(desc(resume.createdAt))
             .limit(10),
             
-            // 获取分析列表
-            this.db.select({
-                id: resumeAnalysis.id,
-                fileName: resumeAnalysis.fileName,
-                score: resumeAnalysis.score,
-                createdAt: resumeAnalysis.createdAt,
-            })
-            .from(resumeAnalysis)
-            .where(eq(resumeAnalysis.userId, userId))
-            .orderBy(desc(resumeAnalysis.createdAt))
-            .limit(10),
-            
             // 获取题目列表
             this.db.select({
                 id: question.id,
@@ -99,7 +81,6 @@ export class DashboardService {
             // 获取使用量
             redis.get(`${INTERVIEW_RATE_LIMIT_PREFIX}${userId}:${todayKey}`) as Promise<number | null>,
             redis.get(`${RESUME_GENERATE_LIMIT_PREFIX}${userId}:${todayKey}`) as Promise<number | null>,
-            redis.get(`${RESUME_ANALYZE_LIMIT_PREFIX}${userId}:${todayKey}`) as Promise<number | null>,
             redis.get(`${QUESTION_RATE_LIMIT_PREFIX}${userId}:${todayKey}`) as Promise<number | null>,
         ]);
 
@@ -119,13 +100,6 @@ export class DashboardService {
                 date: r.createdAt.getTime(),
                 score: null,
             })),
-            ...analyses.slice(0, 3).map(a => ({
-                type: 'analysis' as const,
-                id: a.id,
-                title: a.fileName,
-                date: a.createdAt.getTime(),
-                score: a.score,
-            })),
             ...questions.slice(0, 3).map(q => ({
                 type: 'question' as const,
                 id: q.id,
@@ -139,7 +113,6 @@ export class DashboardService {
             stats: {
                 interviewCount,
                 resumeCount,
-                analysisCount,
                 questionCount,
             },
             usage: {
@@ -150,10 +123,6 @@ export class DashboardService {
                 generate: {
                     used: generateUsed || 0,
                     limit: isAdmin ? 100 : FREE_USER_DAILY_GENERATE_LIMIT,
-                },
-                analyze: {
-                    used: analyzeUsed || 0,
-                    limit: isAdmin ? 100 : FREE_USER_DAILY_ANALYZE_LIMIT,
                 },
                 question: {
                     used: questionUsed || 0,

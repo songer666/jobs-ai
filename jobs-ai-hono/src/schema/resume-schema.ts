@@ -67,41 +67,6 @@ export const resumeChatResponseSchema = z.object({
     collectedInfo: z.any().optional(),
 });
 
-// ==================== 简历分析相关 Schema ====================
-
-// 简历分析响应
-export const resumeAnalysisResponseSchema = z.object({
-    success: z.boolean(),
-    analysis: z.object({
-        id: z.string(),
-        userId: z.string(),
-        jobInfoId: z.string().nullable(),
-        fileName: z.string(),
-        pdfR2Key: z.string(),
-        feedback: z.string().nullable(),
-        score: z.number().nullable(),
-        jobDescription: z.string().nullable(),
-        createdAt: z.number(),
-        updatedAt: z.number(),
-    }).nullable().optional(),
-    message: z.string().optional(),
-});
-
-// 简历分析列表响应
-export const resumeAnalysisListResponseSchema = z.object({
-    success: z.boolean(),
-    analyses: z.array(z.object({
-        id: z.string(),
-        userId: z.string(),
-        jobInfoId: z.string().nullable(),
-        fileName: z.string(),
-        pdfR2Key: z.string(),
-        score: z.number().nullable(),
-        createdAt: z.number(),
-        updatedAt: z.number(),
-    })),
-});
-
 // ==================== 通用 Schema ====================
 
 // 使用量响应

@@ -35,40 +35,6 @@ export const resume = sqliteTable(
   ]
 );
 
-// 简历分析表 - 用户上传简历的分析结果
-export const resumeAnalysis = sqliteTable(
-  "resume_analysis",
-  {
-    id: text("id").primaryKey().$defaultFn(() => randomUUID()),
-    userId: text("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    jobInfoId: text("job_info_id")
-      .references(() => jobInfo.id, { onDelete: "set null" }),
-    // 文件名
-    fileName: text("file_name").notNull(),
-    // PDF 文件 R2 存储 key
-    pdfR2Key: text("pdf_r2_key").notNull(),
-    // 分析结果 (Markdown 格式)
-    feedback: text("feedback"),
-    // 评分 (0-100)
-    score: integer("score"),
-    // 目标职位描述 (可选)
-    jobDescription: text("job_description"),
-    createdAt: integer("created_at", { mode: "timestamp_ms" })
-      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-      .notNull(),
-    updatedAt: integer("updated_at", { mode: "timestamp_ms" })
-      .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
-      .$onUpdate(() => new Date())
-      .notNull(),
-  },
-  (table) => [
-    index("resume_analysis_userId_idx").on(table.userId),
-    index("resume_analysis_jobInfoId_idx").on(table.jobInfoId),
-  ]
-);
-
 export const resumeRelations = relations(resume, ({ one }) => ({
   user: one(user, {
     fields: [resume.userId],
@@ -76,17 +42,6 @@ export const resumeRelations = relations(resume, ({ one }) => ({
   }),
   jobInfo: one(jobInfo, {
     fields: [resume.jobInfoId],
-    references: [jobInfo.id],
-  }),
-}));
-
-export const resumeAnalysisRelations = relations(resumeAnalysis, ({ one }) => ({
-  user: one(user, {
-    fields: [resumeAnalysis.userId],
-    references: [user.id],
-  }),
-  jobInfo: one(jobInfo, {
-    fields: [resumeAnalysis.jobInfoId],
     references: [jobInfo.id],
   }),
 }));

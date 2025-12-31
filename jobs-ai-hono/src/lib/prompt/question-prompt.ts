@@ -44,7 +44,7 @@ ${jobInfo.title ? `- Job Title: \`${jobInfo.title}\`` : ''}
 ${previousQuestionsContext}
 
 Guidelines:
-- **IMPORTANT: Keep the question SHORT and CONCISE.** The entire question should be answerable in 5-10 minutes.
+- **CRITICAL: Keep the question SHORT and CONCISE.** Maximum 300 words. The entire question should be answerable in 5-10 minutes.
 - **IMPORTANT: The question should encourage the candidate to express their understanding through code.**
 - Question types (mix these two types):
   1. **Explain with Code**: A short conceptual question requiring a code example. Example: "What is a closure? Show with a simple example."
@@ -59,7 +59,8 @@ Guidelines:
 - Return only the question. Do not include the answer.
 - The question should be formatted as markdown.
 - Output in ${lang.outputLanguage}.
-- **IMPORTANT: Each question must cover a DIFFERENT topic from previous questions.**`;
+- **IMPORTANT: Each question must cover a DIFFERENT topic from previous questions.**
+- **IMPORTANT: Due to time constraints, keep the question under 300 words total.**`;
 }
 
 export function getQuestionFeedbackPrompt(
@@ -99,8 +100,9 @@ Instructions:
   - 4-6 = Partially correct or incomplete
   - 1-3 = Largely incorrect or missing the point
 - Provide **concise, constructive feedback** on what was done well and what could be improved.
+- **CRITICAL: Keep feedback BRIEF and TO THE POINT.** Maximum 500 words total for both feedback and reference answer.
 - Be honest but professional.
-- Include a full correct answer in the output.
+- Include a full correct answer in the output, but keep it concise.
 - Refer to the candidate as "${lang.referToCandidate}" in your feedback.
 - **IMPORTANT: Use Markdown syntax for formatting**, including:
   - Use \`##\` for section headers
@@ -109,6 +111,7 @@ Instructions:
   - Use \`-\` or \`1.\` for lists
   - Keep code examples concise and well-formatted
 - Stop generating output as soon you have provided the rating, feedback, and full correct answer.
+- **IMPORTANT: Due to time constraints, keep the entire response under 500 words.**
 
 Output Format (strictly follow this Markdown structure):
 ${outputFormat}`;

@@ -210,7 +210,8 @@ interviewAiRoute.post("/complete", authMiddleware, async (c) => {
                 userName: user.name || "候选人",
                 language: interview.language || 'zh',
                 model: (interview.model as 'gemini' | 'deepseek') || 'gemini',
-            }
+            },
+            c.env.QSTASH_URL
         );
 
         console.log('已发送评分任务到 QStash:', interviewId);
@@ -409,7 +410,8 @@ interviewAiRoute.post("/:id/timer/start", authMiddleware, async (c) => {
                 c.env.QSTASH_TOKEN,
                 callbackUrl,
                 { interviewId },
-                INTERVIEW_MAX_DURATION // 3600秒（1小时）
+                INTERVIEW_MAX_DURATION, // 3600秒（1小时）
+                c.env.QSTASH_URL
             );
             console.log('已安排1小时后自动结束面试:', interviewId);
         } catch (error) {

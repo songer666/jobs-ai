@@ -12,7 +12,7 @@ import {
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useSessionCache } from '../../lib/session-provider';
 import { dashboardApi } from '../../api/dashboard';
-import type { DashboardStats } from '../../api/dashboard';
+import type { DashboardStats, RecentContact, RecentUser } from '../../api/dashboard';
 import styles from './index.module.css';
 
 const COLORS = ['#1890ff', '#52c41a', '#faad14', '#722ed1', '#eb2f96', '#13c2c2'];
@@ -20,8 +20,8 @@ const COLORS = ['#1890ff', '#52c41a', '#faad14', '#722ed1', '#eb2f96', '#13c2c2'
 const DashboardPage = () => {
   const { session } = useSessionCache();
   const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [recentContacts, setRecentContacts] = useState<any[]>([]);
-  const [recentUsers, setRecentUsers] = useState<any[]>([]);
+  const [recentContacts, setRecentContacts] = useState<RecentContact[]>([]);
+  const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
